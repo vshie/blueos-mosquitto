@@ -3,6 +3,20 @@
 MQTT broker extension for BlueOS. First piece of the ESPHome-without-HA stack
 (Mosquitto → InfluxDB → Grafana, plus an ESPHome builder later).
 
+## Provenance / credits
+
+This is **not** a fork of the official [`eclipse-mosquitto`](https://hub.docker.com/_/eclipse-mosquitto) Docker Hub image.
+
+| Layer | Source |
+|-------|--------|
+| Base OS | [`alpine:3.21`](https://hub.docker.com/_/alpine) |
+| Broker binary | Alpine package `mosquitto` → upstream **[Eclipse Mosquitto](https://mosquitto.org/)** ([GitHub](https://github.com/eclipse-mosquitto/mosquitto)) |
+| This repo | New BlueOS wrapper (config, entrypoint, status UI, `LABEL permissions`) by `vshie` |
+
+**Why not `FROM eclipse-mosquitto`?** The official Hub image does not publish `linux/arm/v7`. Alpine’s package does, which we need for Pi 4 32-bit BlueOS alongside Pi 4/5 `arm64`.
+
+Eclipse Mosquitto is dual-licensed under the [Eclipse Public License 2.0](https://www.eclipse.org/legal/epl-2.0/) and [Eclipse Distribution License 1.0](https://www.eclipse.org/org/documents/edl-v10.php). This extension redistributes the broker via distro packages; keep upstream notices if you vendor sources later. Alpine Linux is [MIT](https://www.alpinelinux.org/).
+
 ## Install
 
 Docker Hub image (after CI publishes):
