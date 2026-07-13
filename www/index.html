@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlueOS Mosquitto</title>
+  <style>
+    :root {
+      --bg: #0b1c24;
+      --panel: #132a33;
+      --text: #e8f1f4;
+      --muted: #8aa4af;
+      --accent: #3dbb9a;
+      --line: #1e3d49;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #1a4a3f 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #1a3550 0%, transparent 50%),
+        var(--bg);
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+    .sub { color: var(--muted); margin-bottom: 1.75rem; }
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, black);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.95rem;
+    }
+    .row:last-child { border-bottom: none; }
+    .k { color: var(--muted); }
+    .v { font-family: "IBM Plex Mono", ui-monospace, monospace; color: var(--accent); }
+    code {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      background: #0a151a;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+    pre {
+      margin: 0.75rem 0 0;
+      padding: 0.9rem 1rem;
+      overflow-x: auto;
+      background: #0a151a;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>BlueOS Mosquitto</h1>
+    <p class="sub">MQTT broker for ESPHome nodes, Influx ingest, and site automation — without Home Assistant.</p>
+
+    <section class="card" id="status">
+      <div class="row"><span class="k">Status</span><span class="v" id="alive">loading…</span></div>
+      <div class="row"><span class="k">MQTT TCP</span><span class="v" id="tcp">1883</span></div>
+      <div class="row"><span class="k">WebSockets</span><span class="v" id="ws">9001</span></div>
+      <div class="row"><span class="k">Auth</span><span class="v" id="auth">anonymous (v0.1)</span></div>
+    </section>
+
+    <section class="card">
+      <p class="k" style="margin-top:0">ESPHome snippet</p>
+<pre>mqtt:
+  broker: &lt;blueos-ip&gt;
+  # discovery: false
+  topic_prefix: blueos/relay</pre>
+      <p class="sub" style="margin:0.75rem 0 0">Replace <code>&lt;blueos-ip&gt;</code> with the Pi address on your LAN (or the hostname BlueOS uses).</p>
+    </section>
+
+    <section class="card">
+      <p class="k" style="margin-top:0">Quick subscribe test (from a laptop)</p>
+<pre>mosquitto_sub -h &lt;blueos-ip&gt; -t '#' -v</pre>
+    </section>
+  </main>
+  <script>
+    fetch("runtime.json")
+      .then((r) => r.json())
+      .then((j) => {
+        document.getElementById("alive").textContent = "running " + (j.version || "");
+        document.getElementById("tcp").textContent = String(j.mqtt_tcp || 1883);
+        document.getElementById("ws").textContent = String(j.mqtt_websockets || 9001);
+        document.getElementById("auth").textContent = j.anonymous ? "anonymous (v0.1)" : "password required";
+      })
+      .catch(() => {
+        document.getElementById("alive").textContent = "UI up (runtime.json missing)";
+      });
+  </script>
+</body>
+</html>
